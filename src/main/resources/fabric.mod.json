@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "pulsey",
+  "version": "${version}",
+  "name": "Pulsey Client",
+  "description": "A configurable ClickGUI with storage and spawner outlines and a singleplayer freecam.",
+  "authors": ["Pulsey Client contributors"],
+  "license": "MIT",
+  "icon": "assets/pulsey/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["dev.pulsey.PulseyClient"]
+  },
+  "mixins": ["pulsey.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
