@@ -51,4 +51,3 @@ public class PulseyClient implements ClientModInitializer {
         });
     }
 }
-c
