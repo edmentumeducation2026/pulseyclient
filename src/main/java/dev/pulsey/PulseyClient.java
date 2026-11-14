@@ -28,11 +28,14 @@ public class PulseyClient implements ClientModInitializer {
         KeyMapping freecamKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
                 "key.pulsey.freecam", InputConstants.Type.KEYSYM, InputConstants.KEY_V, category));
 
-        ClickGui gui = new ClickGui();
+        ClickGui[] gui = new ClickGui[1]; // created lazily, once Minecraft is fully started
 
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
             while (openGui.consumeClick()) {
-                if (mc.screen == null) mc.setScreen(gui);
+                if (mc.screen == null) {
+                    if (gui[0] == null) gui[0] = new ClickGui();
+                    mc.setScreen(gui[0]);
+                }
             }
             while (freecamKey.consumeClick()) {
                 if (mc.screen == null && mc.player != null) ModuleManager.freecam.toggle();
@@ -48,3 +51,4 @@ public class PulseyClient implements ClientModInitializer {
         });
     }
 }
+c
