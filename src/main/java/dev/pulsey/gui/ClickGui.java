@@ -55,6 +55,11 @@ public class ClickGui extends Screen {
         }
     }
 
+    /** Always use the live font; the Screen's own field can be null when the screen is built early. */
+    private net.minecraft.client.gui.Font fnt() {
+        return net.minecraft.client.Minecraft.getInstance().font;
+    }
+
     @Override public boolean isPauseScreen() { return false; }
 
     @Override
@@ -131,7 +136,7 @@ public class ClickGui extends Screen {
         maxScroll = Math.max(0, bottom - this.height + 36);
 
         if (hovered != null) drawTooltip(g, hovered.description);
-        g.drawString(this.font, "Pulsey Client  |  Right-click a module for settings", 8, this.height - 12, Theme.MUTED, false);
+        g.drawString(fnt(), "Pulsey Client  |  Right-click a module for settings", 8, this.height - 12, Theme.MUTED, false);
     }
 
     /** Draws one panel; returns its unscrolled bottom edge. */
@@ -149,9 +154,9 @@ public class ClickGui extends Screen {
         if (body > 0) g.fill(x, y + HEADER - 6, x + PW, y + HEADER, Theme.HEADER_BG);
         g.fill(x + 8, y + HEADER - 1, x + PW - 8, y + HEADER, accent);
 
-        g.drawString(this.font, Component.literal(p.title.toUpperCase()).withStyle(ChatFormatting.BOLD),
+        g.drawString(fnt(), Component.literal(p.title.toUpperCase()).withStyle(ChatFormatting.BOLD),
                 x + 10, y + 8, Theme.TEXT, false);
-        g.drawString(this.font, p.open ? "-" : "+", x + PW - 14, y + 8, Theme.MUTED, false);
+        g.drawString(fnt(), p.open ? "-" : "+", x + PW - 14, y + 8, Theme.MUTED, false);
 
         hit(x, y, PW, HEADER, y, y + HEADER,
                 (cx, cy, btn) -> {
@@ -182,9 +187,9 @@ public class ClickGui extends Screen {
             g.fill(x, cy + 2, x + 2, cy + ROW - 2, Colors.withAlpha(accent, en));
         }
         int textColor = m.toggleable ? Colors.lerp(Theme.MUTED, Theme.TEXT, en) : Theme.TEXT;
-        g.drawString(this.font, m.name, x + 10, cy + 6, textColor, false);
+        g.drawString(fnt(), m.name, x + 10, cy + 6, textColor, false);
         if (!m.settings.isEmpty()) {
-            g.drawString(this.font, peek(m) > 0.5f ? "v" : ">", x + PW - 12, cy + 6, Theme.MUTED, false);
+            g.drawString(fnt(), peek(m) > 0.5f ? "v" : ">", x + PW - 12, cy + 6, Theme.MUTED, false);
         }
 
         hit(x, cy, PW, ROW, cy, cy + ROW, (cx, cy2, btn) -> {
@@ -212,7 +217,7 @@ public class ClickGui extends Screen {
         int w = PW;
         if (s instanceof Setting.Bool b) {
             float a = anim(b, b.value ? 1f : 0f, dt, 16f);
-            g.drawString(this.font, b.name, x + 8, y + 5, Theme.TEXT_DIM, false);
+            g.drawString(fnt(), b.name, x + 8, y + 5, Theme.TEXT_DIM, false);
             int pw = 24, ph = 11, px = x + w - 8 - pw, py = y + 3;
             Draw.rrect(g, px, py, pw, ph, 5, Colors.lerp(Theme.TRACK, accent, a));
             Draw.rrect(g, px + 1 + (int) ((pw - ph) * a), py + 1, ph - 2, ph - 2, 4, 0xFFFFFFFF);
@@ -221,9 +226,9 @@ public class ClickGui extends Screen {
         }
         if (s instanceof Setting.Num n) {
             float frac = anim(n, (float) n.fraction(), dt, 22f);
-            g.drawString(this.font, n.name, x + 8, y + 3, Theme.TEXT_DIM, false);
+            g.drawString(fnt(), n.name, x + 8, y + 3, Theme.TEXT_DIM, false);
             String val = n.display();
-            g.drawString(this.font, val, x + w - 8 - this.font.width(val), y + 3, accent, false);
+            g.drawString(fnt(), val, x + w - 8 - fnt().width(val), y + 3, accent, false);
             int tx = x + 8, tw = w - 16, ty = y + 16;
             Draw.rrect(g, tx, ty, tw, 3, 1, Theme.TRACK);
             int fw = (int) (tw * frac);
@@ -234,16 +239,16 @@ public class ClickGui extends Screen {
             return 24;
         }
         if (s instanceof Setting.Mode m) {
-            g.drawString(this.font, m.name, x + 8, y + 5, Theme.TEXT_DIM, false);
+            g.drawString(fnt(), m.name, x + 8, y + 5, Theme.TEXT_DIM, false);
             String v = m.value();
-            int cw = this.font.width(v) + 10, cx0 = x + w - 8 - cw;
+            int cw = fnt().width(v) + 10, cx0 = x + w - 8 - cw;
             Draw.rrect(g, cx0, y + 2, cw, 14, 4, Theme.CHIP);
-            g.drawString(this.font, v, cx0 + 5, y + 5, accent, false);
+            g.drawString(fnt(), v, cx0 + 5, y + 5, accent, false);
             hit(x, y, w, 18, clipT, clipB, (cx, cy, btn) -> { if (btn == 1) m.prev(); else m.next(); }, null);
             return 18;
         }
         if (s instanceof Setting.Color c) {
-            g.drawString(this.font, c.name, x + 8, y + 5, Theme.TEXT_DIM, false);
+            g.drawString(fnt(), c.name, x + 8, y + 5, Theme.TEXT_DIM, false);
             int sx0 = x + w - 8 - 24;
             Draw.rrect(g, sx0 - 1, y + 2, 26, 14, 5, 0xFF343954);
             Draw.rrect(g, sx0, y + 3, 24, 12, 4, 0xFF000000 | c.rgb());
@@ -294,9 +299,9 @@ public class ClickGui extends Screen {
     }
 
     private void drawTooltip(GuiGraphics g, String s) {
-        int w = this.font.width(s) + 16, x = (this.width - w) / 2, y = this.height - 32;
+        int w = fnt().width(s) + 16, x = (this.width - w) / 2, y = this.height - 32;
         Draw.rrect(g, x, y, w, 18, 5, 0xE6101218);
-        g.drawString(this.font, s, x + 8, y + 5, Theme.TEXT_DIM, false);
+        g.drawString(fnt(), s, x + 8, y + 5, Theme.TEXT_DIM, false);
     }
 
     private void hit(int x, int y, int w, int h, int clipT, int clipB, Click click, Drag drag) {
